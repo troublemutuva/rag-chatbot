@@ -42,3 +42,7 @@ def chat(request: ChatRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     return ChatResponse(answer=answer)
+
+@app.get("/")
+def read_root():
+    return {"message": "LangChain RAG Chatbot API is running. Go to /docs to test endpoints."}
