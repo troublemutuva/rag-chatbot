@@ -1,14 +1,5 @@
-"""
-FastAPI wrapper around the LangChain RAG chain.
-
-Run locally:
-    uvicorn app.main:app --reload --port 8000
-
-Then POST to /chat:
-    curl -X POST http://localhost:8000/chat -H "Content-Type: application/json" \
-         -d '{"question": "What are your support hours?"}'
-"""
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 
 from app.rag import answer_question
@@ -42,10 +33,6 @@ def chat(request: ChatRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     return ChatResponse(answer=answer)
-
-@app.get("/")
-def read_root():
-    return {"message": "LangChain RAG Chatbot API is running. Go to /docs to test endpoints."}
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -89,12 +76,10 @@ def read_root():
                     const data = await res.json();
 
                     if (!res.ok) {
-                        // Display backend validation or server errors
                         const errorMsg = data.detail ? JSON.stringify(data.detail) : "Server error";
                         chatbox.innerHTML += `<p class="error"><strong>Bot Error (${res.status}):</strong> ${errorMsg}</p>`;
                     } else {
-                        // Dynamically pick the returned text key
-                        const botReply = data.answer || data.response || data.result || data.reply || JSON.stringify(data);
+                        const botReply = data.answer || JSON.stringify(data);
                         chatbox.innerHTML += `<p><strong>Bot:</strong> ${botReply}</p>`;
                     }
                 } catch (err) {
