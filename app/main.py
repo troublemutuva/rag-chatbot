@@ -41,7 +41,7 @@ def read_root():
     <!DOCTYPE html>
     <html>
     <head>
-        <title>RAG Chatbot</title>
+        <title>RAG Chatbot by Trouble Mutuva</title>
         <style>
             body { font-family: Arial, sans-serif; max-width: 600px; margin: 40px auto; padding: 20px; }
             #chatbox { height: 300px; border: 1px solid #ccc; overflow-y: scroll; padding: 10px; margin-bottom: 10px; }
@@ -51,7 +51,7 @@ def read_root():
         </style>
     </head>
     <body>
-        <h2>RAG Chatbot Interface</h2>
+        <h2>RAG Chatbot Interface by Trouble Mutuva</h2>
         <div id="chatbox"></div>
         <input type="text" id="question" placeholder="Type your question..." />
         <button onclick="sendQuestion()">Send</button>
