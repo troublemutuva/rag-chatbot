@@ -47,10 +47,6 @@ def chat(request: ChatRequest):
 def read_root():
     return {"message": "LangChain RAG Chatbot API is running. Go to /docs to test endpoints."}
 
-from fastapi import FastAPI
-from fastapi.responses import HTMLResponse
-
-app = FastAPI()
 
 @app.get("/", response_class=HTMLResponse)
 def read_root():
@@ -64,6 +60,7 @@ def read_root():
             #chatbox { height: 300px; border: 1px solid #ccc; overflow-y: scroll; padding: 10px; margin-bottom: 10px; }
             input { width: 75%; padding: 10px; }
             button { padding: 10px 15px; }
+            .error { color: red; }
         </style>
     </head>
     <body>
@@ -76,22 +73,39 @@ def read_root():
             async function sendQuestion() {
                 const input = document.getElementById("question");
                 const chatbox = document.getElementById("chatbox");
-                const question = input.value;
+                const question = input.value.trim();
                 if (!question) return;
 
                 chatbox.innerHTML += `<p><strong>You:</strong> ${question}</p>`;
                 input.value = "";
 
-                const res = await fetch("/chat", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ question: question })
-                });
-                const data = await res.json();
-                chatbox.innerHTML += `<p><strong>Bot:</strong> ${data.answer}</p>`;
+                try {
+                    const res = await fetch("/chat", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ question: question })
+                    });
+
+                    const data = await res.json();
+
+                    if (!res.ok) {
+                        // Display backend validation or server errors
+                        const errorMsg = data.detail ? JSON.stringify(data.detail) : "Server error";
+                        chatbox.innerHTML += `<p class="error"><strong>Bot Error (${res.status}):</strong> ${errorMsg}</p>`;
+                    } else {
+                        // Dynamically pick the returned text key
+                        const botReply = data.answer || data.response || data.result || data.reply || JSON.stringify(data);
+                        chatbox.innerHTML += `<p><strong>Bot:</strong> ${botReply}</p>`;
+                    }
+                } catch (err) {
+                    chatbox.innerHTML += `<p class="error"><strong>Network Error:</strong> Failed to reach server.</p>`;
+                }
+
                 chatbox.scrollTop = chatbox.scrollHeight;
             }
         </script>
     </body>
     </html>
     """
+
+
